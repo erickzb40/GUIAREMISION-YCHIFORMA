@@ -1,0 +1,413 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-primary">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">Inicio</a>
+    <a class="navbar-brand" href="/#/reporte">Reporte</a>
+<!--     <a class="navbar-brand" href="facturacion">Facturación</a> -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+      aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+      </ul>
+      <form class="d-flex">
+        <button class="btn btn-danger" (click)="CerrarSesion()" type="submit">Salir</button>
+      </form>
+    </div>
+  </div>
+</nav>
+<div class="wrapper">
+  <div class="card m-2">
+    <div class="card-header">
+      <h4>facturación Electronica</h4>
+    </div>
+    <div class="card-body">
+      <div class="row mb-1">
+        <div class="col-2"><!--EMPRESA-->
+          <label>Empresa:</label>
+        </div>
+        <div class="col-3"><!--LISTA EMPRESAS-->
+          <select class="form-select" aria-label="Seleccione una empresa" [(ngModel)]="facturaElectronica.empresaName">
+            <option selected [ngValue]="null">Seleccionar</option>
+            <option *ngFor="let empresa of listaEmpresas" [ngValue]="empresa.nombreempresa">{{empresa.razonsocialemisor}}</option>
+          </select>
+        </div>
+        <div class="col-1"><!--FECHA EMISION-->
+          <label>Fecha Emision</label>
+        </div>
+        <div class="col-2"><!--FECHA EMISION INPUT DATE-->
+          <input type="date" class="form-control" [(ngModel)]="facturaElectronica.fechaEmision">
+        </div>
+        <div class="col-2"><!--FECHA VENCIMIENTO-->
+          <label>Fecha Vencimiento</label>
+        </div>
+        <div class="col-2"><!--FECHA VENCIMIENTO INPUT DATE-->
+          <input type="date" class="form-control" [(ngModel)]="facturaElectronica.fechaVencimiento">
+        </div>
+      </div>
+      <div class="row mb-1">
+        <div class="col-2"><!--TIPOS DOCUMENTO-->
+          <label>Tipo Documento:</label>
+        </div>
+        <div class="col-3"><!--LISTA TIPOS DOCUMENTO-->
+          <select class="form-select" placeholder="Seleccione un tipo de documento" [(ngModel)]="facturaElectronica.tipoDocumentoSelect">
+            <option selected [ngValue]="null">Seleccionar</option>
+            <option *ngFor="let item of listaTiposDocumento" [ngValue]="item.tipodocumento+'-'+item.tipodocumentoafecto">{{item.descripcion}}</option>
+          </select>
+        </div>
+        <div class="col-1"><!--CLIENTE-->
+          <label>Cliente</label>
+        </div>
+        <div class="col-6"><!--INPUT CLIENTE-->
+          <div class="input-group">
+            <input type="text" class="form-control" disabled="true" value="{{facturaElectronica.clienteName}}">
+          </div>
+        </div>
+      </div>
+      <div class="row mb-1">
+        <div class="col-2"><!--SERIE NUMERO-->
+          <label>
+            Serie Y Numero
+          </label>
+        </div>
+        <div class="col-3"><!--SERIE NUMERO-->
+          <input type="text" class="form-control" disabled value="{{getNumeroSerie()}}">
+        </div>
+        <div class="col-1"><!--MONEDA-->
+          Moneda
+        </div>
+        <div class="col-2"><!--BTNS MONEDA-->
+          <div class="form-check form-check-inline"><!--BTN MONEDA 1-->
+            <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="Soles" [(ngModel)]="facturaElectronica.moneda">
+            <label class="form-check-label" for="inlineRadio1" >Soles</label>
+          </div>
+          <div class="form-check form-check-inline"><!--BTN MONEDA 2-->
+            <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="Dolares" [(ngModel)]="facturaElectronica.moneda">
+            <label class="form-check-label" for="inlineRadio2" >Usd Dolares</label>
+          </div>
+        </div>
+        <div class="col-1"><!--TC-->
+          <label style="text-align: right;">Tipo Cambio:</label>
+        </div>
+        <div class="col-3"><!--TC - INPUT-->
+          <input type="number" class="form-control" [(ngModel)]="facturaElectronica.tipoCambio">
+        </div>
+      </div>
+      <div class="row mb-1">
+        <div class="col-2"><!--Forma pago-->
+          <label>Forma pago</label>
+        </div>
+        <div class="col-3" style="height: 40px;"><!--LISTA Forma pago-->
+          <select class="form-select"  [(ngModel)]="facturaElectronica.formaPagoName" [disabled]="facturaElectronica.tipoDocumentoSelect == null ? true : false">
+            <option selected [ngValue]="null">Seleccionar</option>
+            <option *ngFor="let item of listaFormaPago" [ngValue]="item.descripcion">{{item.descripcion}}</option>
+          </select>
+        </div>
+        <div class="col-1"><!--OC-->
+          OC:
+        </div>
+        <div class="col-2"><!--OC - INPUT-->
+          <input type="text" class="form-control" [(ngModel)]="facturaElectronica.ordenCompra">
+        </div>
+        <div class="col-1"><!--DETRACCION-->
+          <label>Detracción:</label>
+        </div>
+        <div class="col-3"><!--LISTA Detraccion-->
+          <select class="form-select" [(ngModel)]="facturaElectronica.detraccion" ><!--(ngModelChange)="getMontoDetraccion()"-->
+            <option selected [ngValue]="null" >Seleccionar</option>
+            <option *ngFor="let item of listaDetraccion" [ngValue]="item">{{item.descripcion}}</option>
+          </select>
+        </div>
+      </div>
+      <div class="row mb-1">
+        <div class="col-2"><!--OBSERVACIONES-->
+          <label>
+            Observaciones
+          </label>
+        </div>
+        <div class="col-6"><!--OBSERVACIONES - INPUT-->
+          <input type="text" class="form-control" [(ngModel)]="facturaElectronica.observaciones">
+        </div>
+        <div class="col-1"><!--ESTADO-->
+          <label>Estado</label>
+        </div>
+        <div class="col-3"><!--ESTADO - INPUT-->
+          <input type="text" class="form-control" [(ngModel)]="facturaElectronica.estado">
+        </div>
+      </div>
+      <hr>
+      <div class="row">
+        <div class="col-6 mb-1">
+          <div class="row mb-1"><!--REFERENCA-->
+            <div class="col-4">
+              <label>Referencia</label>
+            </div>
+            <div class="col-8"><!--REFERENCIA INPUT-->
+              <div class="input-group">
+                <input type="text" class="form-control" [disabled]="isNCND()">
+                <span class="input-group-text">...</span>
+              </div>
+            </div>
+          </div>
+          <div class="row mb-1"><!--NC ND-->
+            <div class="col-4"><!--TIPO NC ND-->
+              <label>Tipo Nc/Nd</label>
+            </div>
+            <div class="col-8"><!--TIPO NC ND LISTA-->
+              <select class="form-select" [(ngModel)]="facturaElectronica.tipoNcNdName" [disabled]="isNCND()">
+                <option selected [ngValue]="null" >Seleccionar</option>
+                <option *ngFor="let item of listaTipoNcNd" [ngValue]="item.descripcion">{{item.descripcion}}</option>
+              </select>
+            </div>
+          </div>
+          <div class="row mb-1"><!--Motivo Nc Nd-->
+            <div class="col-4"><!--Motivo label-->
+              <label>Motivo</label>
+            </div>
+            <div class="col-8"><!--Motivo inputl-->
+              <input type="text" class="form-control" [(ngModel)]="facturaElectronica.motivoNcNd" [disabled]="isNCND()">
+            </div>
+          </div>
+        </div>
+        <div class="col-6 mb-1">
+          <div class="row mb-1"><!--IMPORTAR DATOS-->
+            <div class="col-4"><!--IMPORTAR DATOS LABEL-->
+              <label>Importar Datos</label>
+            </div>
+            <div class="col-8"><!--IMPORTAR DATOS INPUT-->
+              <div class="input-group">
+                <input type="text" class="form-control" value="{{facturaElectronica.numerInvoiceImport}}" [(ngModel)]="facturaElectronica.numerInvoiceImport" (keyup.enter)="importarDocumentoCompleto(facturaElectronica.numerInvoiceImport)">
+                <span class="input-group-text hoverPointer" (click)="abrirModal(importarDocumentos, 'xl')">...</span>
+              </div>
+            </div>
+          </div>
+          <div class="row mb-1"><!--CUOTAS-->
+            <div class="col-4">
+              <label style="margin-right: 10px;">Cuotas</label>
+              <button class="btn btn-light btn-circle " (click)="abrirModal(administrarCuotas, 'lg', 'cuotas')" [disabled]="(facturaElectronica.tipoDocumentoSelect?.substring(3,5) == '01' ? false : true) || (facturaElectronica.cuotasFactura.length == 12 ? true : false)">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-plus-circle" color="green" viewBox="0 0 16 16">
+                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                  </svg>
+              </button>
+            </div>
+            <div class="col-8"><!-- TABLA CUOTAS-->
+              <div class="table table-responsive" style="max-height: 150px;">
+                <table class="table table-bordered">
+                  <thead>
+                    <th style="width: 30px;"></th>
+                    <th></th>
+                    <th></th>
+                    <th style="width: 130px;"></th>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let item of facturaElectronica.cuotasFactura, let i = index">
+                      <td>
+                        <span class="hoverPointer" (click)="eliminarCuota(item, i+1)" *ngIf="i+1 == facturaElectronica.cuotasFactura.length">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-dash-circle" color="red" viewBox="0 0 16 16">
+                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                            <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8z"/>
+                          </svg>
+                      </span>
+                      </td>
+                      <td>cuota {{item.nroCuota}}</td>
+                      <td>{{item.fechaCuota}}</td>
+                      <td>{{item.cantidad}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-8 mb-1"><!--DETALLE FACTURA-->
+          <div class="table table-responsive" style="max-height: 440px;">
+            <table class="table table-bordered" >
+              <thead>
+                <th>PRRODUCTONUMBER</th>
+                <th>PRODDESCR</th>
+                <th>SHIPQUANTITY</th>
+                <th>PRICEMODE</th>
+                <th>PRICEPERM</th>
+                <th>ITEMTOTAL</th>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of facturaElectronica.detalleFactura, let i = index">
+                  <td>{{item.productnumber}}</td>
+                  <td>{{item.proddescr}}</td>
+                  <td>{{item.shipquantity}}</td>
+                  <td>{{item.pricemode}}</td>
+                  <td>{{item.priceperm}}</td>
+                  <td>{{item.itemtotal}}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="width: 100%;">
+            <button type="button" class="btn btn-outline-success btn-lg" style="float: right;" (click)="DeclararDocumento()">Declarar Documento </button>
+          </div>
+          <!-- <button type="button" class="btn btn-outline-primary btn-lg">Agregar Detalle </button>
+          &nbsp;<button type="button" class="btn btn-outline-primary btn-lg">Modificar Detalle </button>
+          &nbsp;<button type="button" class="btn btn-outline-primary btn-lg">Quitar Detalle </button>
+          &nbsp;<button type="button" class="btn btn-outline-primary btn-lg">Letras de Cambio </button>
+          &nbsp;<button type="button" class="btn btn-outline-success btn-lg" (click)="DeclararDocumento()">Declarar Documento </button> -->
+        </div>
+        <div class="col-4 mb-1"><!--MONTOS FACTURA-->
+          <div class="row">
+            <div class="col-4"><!--TOTAL GRAVADA -->
+              <label>Gravada</label>
+            </div>
+            <div class="col-8"><!--TOTAL GRAVADA INPUT -->
+              <p class="pStyleInput">{{getMoney(facturaElectronica.gravada)}}</p>
+            </div>
+            <div class="col-4"><!--TOTAL INAFECTA -->
+              <label>Inafecta</label>
+            </div>
+            <div class="col-8"><!--TOTAL INAFECTA INPUT -->
+              <p class="pStyleInput">{{getMoney(facturaElectronica.inafecta)}}</p>
+            </div>
+            <div class="col-4"><!--TOTAL EXONERACION -->
+              <label>Exonerada</label>
+            </div>
+            <div class="col-8"><!--TOTAL EXONERACION INPUT -->
+              <p class="pStyleInput">{{getMoney(facturaElectronica.exonerada)}}</p>
+            </div>
+            <div class="col-4"><!--TOTAL GRATUITA -->
+              <label>Gratuita</label>
+            </div>
+            <div class="col-8"><!--TOTAL GRATUITA INPUT-->
+              <p class="pStyleInput">{{getMoney(facturaElectronica.exportacion)}}</p>
+            </div>
+            <div class="col-4"><!--TOTAL EXPORTACION-->
+              <label>Exportación</label>
+            </div>
+            <div class="col-8"><!--TOTAL EXPORTACION INPUT-->
+              <p class="pStyleInput">{{getMoney(facturaElectronica.exportacion)}}</p>
+            </div>
+            <div class="col-4"><!--TOTAL IGV-->
+              <label>Total Igv</label>
+            </div>
+            <div class="col-8"><!--TOTAL IGV INPUT-->
+              <p class="pStyleInput">{{getMoney(facturaElectronica.totalIgv)}}</p>
+            </div>
+            <div class="col-4"><!--TOTAL VENTA-->
+              <label>Total Venta</label>
+            </div>
+            <div class="col-8"><!--TOTAL VENTA INPUT-->
+              <p class="pStyleInput">{{getMoney(facturaElectronica.totalVenta)}}</p>
+            </div>
+            <div class="col-4"><!--TOTAL DETRACCION-->
+              <label>Detracción</label>
+            </div>
+            <div class="col-8"><!--TOTAL DETRACCION INPUT-->
+              <p class="pStyleInput">{{getDetraccion(facturaElectronica.totalVenta)}}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<ng-template #administrarCuotas>
+  <div class="card m-2" >
+    <div class="card-header">
+      <h5>Añadir nueva cuota</h5>
+    </div>
+    <div class="card-body">
+      <div class="row" style="width: 100%;">
+        <div class="col-2"><!--FECHA CUOTA-->
+          <label>Fecha</label>
+        </div>
+        <div class="col-3"><!--FECHA CUOTA INPUT DATE-->
+          <input type="date" class="form-control" [(ngModel)]="fechaNuevaCuota">
+        </div>
+        <div class="col-2"><!--CANTIDAD CUOTA-->
+          <label>Cantidad</label>
+        </div>
+        <div class="col-4"><!--CANTIDAD CUOTA INPUT-->
+          <input type="number" [(ngModel)]="cantidadNuevaCuota" min="1">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+			<button type="button" ngbAutofocus class="btn btn-outline-secondary" (click)="cerrarModal()">Cancelar</button>
+			<button type="button" class="btn btn-primary" (click)="agregarCuota()" [disabled]="!(cantidadNuevaCuota > 0)">Agregar</button>
+		</div>
+  </div>
+</ng-template>
+<ng-template #importarDocumentos>
+  <div class="card">
+    <div class="card-header">
+      <h5>Importar Documentos 4D</h5>
+    </div>
+    <div class="card-body">
+      <div class="row mb-1">
+        <div class="col-1">
+          <label>Fecha:</label>
+        </div>
+        <div class="col-3">
+          <input type="date" class="form-control" style="width: 120px;" [(ngModel)]="fechaFiltroImportarDatos">
+        </div>
+        <div class="col-1">
+          <label>Filtrar</label>
+        </div>
+        <div class="col-5">
+          <input type="text" class="form-control"[(ngModel)]="filtroFechaSub1" (focus)="true"  value="{{convertirFormatoFecha(fechaFiltroImportarDatos)}}" (keyup.enter)="importarDocumentoPreview(convertirFormatoFecha(fechaFiltroImportarDatos))">
+        </div>
+        <div class="col-1">
+          <button class="btn btn-primary" (click)="importarDocumentoPreview(convertirFormatoFecha(fechaFiltroImportarDatos))">Filtrar</button>
+        </div>
+        <br>
+      </div>
+      <div class="row">
+        <div class="table table-responsive" style="max-height: 450px;">
+          <table class="table table-bordered">
+            <thead>
+              <th>Id</th>
+              <th>TICKET</th>
+              <th>FECHA</th>
+              <th>CLIENTEID</th>
+              <th>CLIENTE</th>
+              <th>TOTAL</th>
+              <th>TERMS</th>
+              <th></th>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of listaImportarDatosPreview, let i = index">
+                <td>{{item.number}}</td>
+                <td>{{item.ticketnum}}</td>
+                <td>{{item.idate}}</td>
+                <td>{{item.customernumber}}</td>
+                <td>{{item.customername}}</td>
+                <td>{{item.total}}</td>
+                <td>{{item.terms}}</td>
+                <td>
+                  <button type="button" class="btn btn-outline-primary btn-xl" (click)="importarDocumentoCompleto(item.number)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-down" viewBox="0 0 16 16">
+                      <path fill-rule="evenodd" d="M3.5 10a.5.5 0 0 1-.5-.5v-8a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 0 0 1h2A1.5 1.5 0 0 0 14 9.5v-8A1.5 1.5 0 0 0 12.5 0h-9A1.5 1.5 0 0 0 2 1.5v8A1.5 1.5 0 0 0 3.5 11h2a.5.5 0 0 0 0-1h-2z"/>
+                      <path fill-rule="evenodd" d="M7.646 15.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 14.293V5.5a.5.5 0 0 0-1 0v8.793l-2.146-2.147a.5.5 0 0 0-.708.708l3 3z"/>
+                    </svg>
+                  </button>
+                </td>
+              </tr>
+              <tr *ngIf="listaImportarDatosPreview.length < 1" style="height: 40px; font-size: 20px;">
+                <p style="margin: auto;">
+                  No hay datos para mostrar
+                </p>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="row mt-2">
+        <div style="text-align: right;">
+          <button type="button" class="btn btn-outline-primary btn-lg">Exportar a Excel </button>
+          &nbsp; &nbsp;<button type="button" class="btn btn-outline-primary btn-lg">Editar </button>
+          &nbsp; &nbsp;<button type="button" class="btn btn-outline-primary btn-lg">Nuevo </button>
+          &nbsp; &nbsp;<button type="button" class="btn btn-outline-primary btn-lg">Nuevo </button>
+          &nbsp;  &nbsp;<button class="btn btn-danger btn-lg" style="width: 80px;margin-right: 5px;" (click)='cerrarModal()'>Salir</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>

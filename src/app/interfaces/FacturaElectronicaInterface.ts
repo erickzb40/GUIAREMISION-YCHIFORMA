@@ -1,0 +1,44 @@
+import { CuotasInterface } from "./CuotasInterface";
+import { DetraccionInterface } from "./DetraccionInterface";
+import { EmpresaInterface } from "./EmpresaInterface";
+import { FormaPagoInterface } from "./FormaPagoInterface";
+import { InvoiceDetalleInterface } from "./InvoiceDetalleInterface";
+import { TicketInterface } from "./TicketInterface";
+import { TipoNcNdInterface } from "./TipoNcNdInterface";
+import { TiposDoumentoInterface } from "./TiposDocumentoInterface";
+
+export interface FacturaElectronicaInterface{
+  numerInvoiceImport?: number;
+  empresa?: EmpresaInterface;
+  empresaName?: string;
+  tipoDocumento? : TiposDoumentoInterface;
+  tipoDocumentoSelect? : string;
+  serieNumero?: string;
+  formaPago?: FormaPagoInterface;
+  formaPagoName?: string;
+  observaciones?: string;
+  fechaEmision?: string;
+  fechaVencimiento?: string;
+  clienteName?: string;
+  moneda?: string;
+  ticket?: TicketInterface;
+  ticketNum?: number;
+  ordenCompra?: string;
+  detraccion?: DetraccionInterface;
+  detraccionName?: string;
+  estado?: string;
+  tipoNcNd?: TipoNcNdInterface;
+  tipoNcNdName?: string;
+  motivoNcNd?: string;
+  cuotasFactura?: CuotasInterface[];
+  detalleFactura?: InvoiceDetalleInterface[];
+  gravada?: number;
+  inafecta?: number;
+  exonerada?: number;
+  gratuita?: number;
+  exportacion?: number;
+  totalIgv?: number;
+  totalVenta?: number;
+  montoDetraccion?: number;
+  tipoCambio?: number;
+}
