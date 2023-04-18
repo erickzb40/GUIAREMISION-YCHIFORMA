@@ -10,6 +10,7 @@ import {NgxPaginationModule} from 'ngx-pagination';
 import { FacturacionComponent } from './components/facturacion/facturacion.component';
 import { GuiaremisionComponent } from './components/guiaremision/guiaremision.component';
 import { ReporteComponent } from './components/reporte/reporte.component';
+import { HeaderComponent } from './components/header/header.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -17,7 +18,8 @@ import { ReporteComponent } from './components/reporte/reporte.component';
     FilterPipe,
     FacturacionComponent,
     GuiaremisionComponent,
-    ReporteComponent
+    ReporteComponent,
+    HeaderComponent
   ],
   imports: [
     BrowserModule,

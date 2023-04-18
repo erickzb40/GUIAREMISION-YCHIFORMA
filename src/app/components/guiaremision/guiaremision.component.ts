@@ -17,9 +17,12 @@ item: any;
   getSpe_despatch(desde: any, hasta: any) {
     throw new Error('Method not implemented.');
   }
+  tipoDocumentoDocRel='01';
+  tipoDocumentoEmisorDocRel='6';
   empaques=[];
   empaquesSeleccionadosCss=[];
   empaquesSeleccionadosTabla=[];
+  documentosReferenciados=[];
   pageEmpaque=0;
   empaque_desde=this.fechaManual(-1);
   empaque_hasta=this.fechaActual();
@@ -33,6 +36,7 @@ item: any;
   pais = 'PE';
   tipodocEmp = '6';
   ubigeoDestinoUpdate = '';
+  codigoPtollegadaUpdate='';
   direccionDestinoUpdate = '';
   destinatarioObject: adquiriente;
   tablaEmpresas = [];
@@ -47,7 +51,7 @@ item: any;
   //-------------------------------------------------------------
   pageProduct = 0;
   vmotivo = '';
-  vmodalidad = '01';
+  vmodalidad = '02';
   fecha_emision = this.fechaActual();
   horaEmision = new Date(this.fecha_emision).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
   fecha_traslado = this.fechaActual().substring(0, 10);
@@ -70,6 +74,7 @@ item: any;
   //destino modal-------------------------------------------
   destinos = [];
   ubigeoDestino = '';
+  codigoPtollegada='';
   direccionDestino = '';
   contador = 0;
   //select destino------------------------------------------
@@ -135,6 +140,8 @@ item: any;
       this.arraySerie = res['SERIE'];
       this.origen= res['ORIGEN'];
       this.vorigen= res['ORIGEN'][0].id;
+    },err=>{
+      this.mostrarMensaje('error','Error en la conexión','Hubo un error en la conexión, vuelva a cargar la pagina');
     });
 
   }
@@ -248,7 +255,12 @@ item: any;
     if (this.ubigeoDestino == '' || this.direccionDestino == '') {
       return Swal.fire({ icon: 'error', title: 'Complete los campos' });
     }
-    var obj = { id: this.contador, ubigeodestino: this.ubigeoDestino, direcciondestino: this.direccionDestino }
+    var obj = {
+      id: this.contador,
+      ubigeodestino: this.ubigeoDestino,
+      direcciondestino: this.direccionDestino,
+      codigolocalanexo:this.codigoPtollegada
+    }
     this.destinos.push(obj);
     this.ubigeoDestino = '';
     this.direccionDestino = '';
@@ -258,10 +270,16 @@ item: any;
     if (this.ubigeoDestinoUpdate == '' || this.direccionDestinoUpdate == '') {
       return Swal.fire({ icon: 'error', title: 'Complete los campos' });
     }
-    var obj = { id: this.contador, UBIGEODESTINO: this.ubigeoDestinoUpdate, DIRECCIONDESTINO: this.direccionDestinoUpdate }
+    var obj = {
+      id: this.contador,
+      UBIGEODESTINO: this.ubigeoDestinoUpdate,
+      DIRECCIONDESTINO: this.direccionDestinoUpdate ,
+      CODIGOLOCALANEXO: this.codigoPtollegadaUpdate
+    }
     this.destinatarioObject.DESTINO.push(obj);
     this.ubigeoDestinoUpdate = '';
     this.direccionDestinoUpdate = '';
+    this.codigoPtollegadaUpdate='';
     this.contador++;
   }
   borrarDestinoArray(id) {
@@ -277,6 +295,9 @@ item: any;
     this.correoDestinatario = '';
     this.numeroDocDestinatario = '';
     this.tipodocumentoadquiriente = '';
+    this.empaques=[];
+    this.empaquesSeleccionadosCss=[];
+    this.empaquesSeleccionadosTabla=[];
   }
 
   asignarChofer(ndoc, nombre, apellido, placa, tipoDoc, brevete) {
@@ -406,6 +427,13 @@ item: any;
       return Swal.fire({ icon: 'warning', title: 'Error campo ubigeoPtoPartida', text: `Mensaje de error cuando el ubigeo no tenga el formato requerido:
       "El dato "ubigeo" no contiene el formato requerido. Por favor modificar el dato en este formulario y en el Labeltraxx`});
     }
+    var motivo=this.vmotivo.split('-');
+    if (origen[3]==''&&(motivo[0]=='04'||motivo[0]=='08'||motivo[0]=='09')){
+      return Swal.fire({ icon: 'warning', title: 'Error campo codigoPtoPartida', text: `El código local anexo del emisor esta vacío o nulo, actualice la información`});
+    }
+    if (destino[3]==''&&(motivo[0]=='04'||motivo[0]=='08'||motivo[0]=='09')){
+      return Swal.fire({ icon: 'warning', title: 'Error campo codigoPtollegada', text: `El código local anexo del cliente está vacío o nulo, actualice la información`});
+    }
     var obj = this.llenarGuia();
     Swal.showLoading();
     this.api.declararGuia(obj).subscribe((res: any) => {
@@ -527,17 +555,18 @@ item: any;
       apellidoConductorSec2: '',
       numeroLicenciaSec2: '',
       numeroDocumentoPtoLlegada: '',
-      codigoPtollegada: '',
+      codigoPtollegada: destino[3],
       ptoLlegadaLongitud: '',
       ptoLlegadaLatitud: '',
       numeroDocumentoPtoPartida: '',
-      codigoPtoPartida: '',
+      codigoPtoPartida: origen[3],
       ptoPartidaLongitud: '',
       ptoPartidaLatitud: '',
       tipoLocacion: '',
       codigoAeropuerto: '',
       nombrePuertoAeropuerto: '',
       spE_DESPATCH_ITEM: this.listadoProductoDetalles,
+      SPE_DESPATCH_DOCRELACIONADO:this.documentosReferenciados
     }
     return obj;
   }
@@ -709,7 +738,6 @@ item: any;
           this.api.getOrigen().subscribe((res: any) => {
             Swal.close();
             this.tablaOrigenes = res;
-
           });
         }, err => {
           if (err.error.detail) { Swal.fire({ icon: 'warning', text: err.error.detail }); }
@@ -780,19 +808,16 @@ item: any;
     const match = numString.match(/\.(\d{4,})/);
     return match !== null && match[1].length > 3;
   }
-  CerrarSesion(){
-    localStorage.removeItem('token');
-    this.rout.navigateByUrl('login');
-  }
+
   abrirEmpaques(empaque){
     this.modalRef = this.modalService.open(empaque, { size: 'lg' });
   }
   cerrarModal(){
     this.modalService.dismissAll();
   }
-  buscarEmpaque(codigo){
+  buscarEmpaque(){
     Swal.showLoading();
-    this.api.getEmpaque(codigo,this.empaque_desde,this.empaque_hasta).subscribe((a:any)=>{
+    this.api.getEmpaque(this.numeroDocDestinatario,this.empaque_desde,this.empaque_hasta).subscribe((a:any)=>{
       this.empaques=a;
       this.empaquesSeleccionadosTabla=[];
       this.empaquesSeleccionadosCss=[];
@@ -842,21 +867,7 @@ item: any;
   }
   asignarEmpaque(){
     try {
-       if(this.listadoProductoDetalles.length==0){
       this.asignarDetalleProductoEmpaque();
-      //aqui va el api para enviar y obtener el adquiriente y el destino
-      this.api.getExtraerEmpaque(this.listadoProductoDetalles[0].codigoEmpaque).subscribe((res:any)=>{
-        this.limpiarDestinatario();
-        this.llenarDestinatario(res.razonSocialAdquiriente, res.numeroDocumentoAdquiriente, null, '6');
-        this.destino=[];
-        var cadenadestino=res.numeroDocumentoAdquiriente+'-'+res.ubigeoPtoLlegada+'-'+res.razonSocialAdquiriente;
-        var obj={id:cadenadestino,text:cadenadestino};
-        this.vdestino=cadenadestino;
-        this.destino.push(obj);
-      });
-    }else{
-      this.asignarDetalleProductoEmpaque();
-    }
     } catch (error) {
      return Swal.fire({icon:'error',title:'Multiples clientes!',text:error});
     }
@@ -896,6 +907,66 @@ item: any;
         this.destino=[{id:result.value,text:result.value}]
         this.vdestino = result.value;
       }
+    });
+  }
+  crearRef(ref: NgForm) {
+    if (ref.valid) {
+      const codigoDocumentoDocRel = ref.value.codigoDocumentoDocRel;
+      const tipoDocumentoDocRel = ref.value.tipoDocumentoDocRel;
+      const numeroDocumentoDocRel = ref.value.numeroDocumentoDocRel;
+      const numeroDocumentoEmisorDocRel = ref.value.numeroDocumentoEmisorDocRel;
+      const tipoDocumentoEmisorDocRel = ref.value.tipoDocumentoEmisorDocRel;
+
+      if (!this.existeDocumentoReferenciado(codigoDocumentoDocRel, tipoDocumentoDocRel, numeroDocumentoDocRel, numeroDocumentoEmisorDocRel, tipoDocumentoEmisorDocRel)) {
+        // El elemento no existe, se agrega a la matriz
+        this.documentosReferenciados.push(ref.value);
+        this.salir();
+      } else {
+        // El elemento ya existe
+        // Aquí puedes agregar el código que desees si el elemento ya existe
+        Swal.fire({icon:'warning',title:'Ya existe el documento!',text:'El docuemnto con el codigo: '+codigoDocumentoDocRel+' ya existe'})
+      }
+    }
+  }
+  existeDocumentoReferenciado(codigoDocumentoDocRel, tipoDocumentoDocRel, numeroDocumentoDocRel, numeroDocumentoEmisorDocRel, tipoDocumentoEmisorDocRel) {
+    return this.documentosReferenciados.some((elemento) =>
+      elemento.codigoDocumentoDocRel == codigoDocumentoDocRel &&
+      elemento.tipoDocumentoDocRel == tipoDocumentoDocRel &&
+      elemento.numeroDocumentoDocRel == numeroDocumentoDocRel &&
+      elemento.numeroDocumentoEmisorDocRel == numeroDocumentoEmisorDocRel &&
+      elemento.tipoDocumentoEmisorDocRel == tipoDocumentoEmisorDocRel
+    );
+  }
+  borrarRef(codigoDocumentoDocRel, tipoDocumentoDocRel, numeroDocumentoDocRel, numeroDocumentoEmisorDocRel, tipoDocumentoEmisorDocRel) {
+    const existe = this.existeDocumentoReferenciado(codigoDocumentoDocRel, tipoDocumentoDocRel, numeroDocumentoDocRel, numeroDocumentoEmisorDocRel, tipoDocumentoEmisorDocRel);
+    if (existe) {
+      const indice = this.documentosReferenciados.findIndex((elemento) =>
+        elemento.codigoDocumentoDocRel == codigoDocumentoDocRel &&
+        elemento.tipoDocumentoDocRel == tipoDocumentoDocRel &&
+        elemento.numeroDocumentoDocRel == numeroDocumentoDocRel &&
+        elemento.numeroDocumentoEmisorDocRel == numeroDocumentoEmisorDocRel &&
+        elemento.tipoDocumentoEmisorDocRel == tipoDocumentoEmisorDocRel
+      );
+      this.documentosReferenciados.splice(indice, 1);
+    } else {
+      // El elemento no existe
+      // Aquí puedes agregar el código que desees si el elemento no existe
+      console.log('El elemento no existe');
+    }
+  }
+  UpdateAdquirienteEmpaque(){
+    Swal.showLoading();
+   this.api.getExtraerEmpaque(300).subscribe(res=>{
+      return this.mostrarMensaje('success','Actualizado!');
+   },err=>{
+      return this.mostrarMensaje('warning',err.error.detail?err.error.detail:'Hubo un error al actualizar los clientes');
+   })
+  }
+  mostrarMensaje(icon,title,text?){
+    return Swal.fire({
+      icon:icon,
+      title:title,
+      text:text
     });
   }
 }

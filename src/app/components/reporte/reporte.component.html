@@ -1,22 +1,5 @@
+<app-header></app-header>
 <div class="wrapper">
-  <nav class="navbar navbar-expand-lg navbar-light bg-primary">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="#">Inicio</a>
-      <a class="navbar-brand" href="/#/reporte">Reporte</a>
-  <!--     <a class="navbar-brand" href="facturacion">Facturación</a> -->
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
-        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        </ul>
-        <form class="d-flex">
-          <button class="btn btn-danger" (click)="CerrarSesion()" type="submit">Salir</button>
-        </form>
-      </div>
-    </div>
-  </nav>
   <div class="card m-2">
     <div class="card-header">
       <h4>Listado de Guias</h4>
@@ -35,7 +18,7 @@
 
         <div class="col-2" style="margin-bottom: 5px;">
           <label for="">Filtrar por serie:</label><br>
-          <input type="text" class="form-control" maxlength="13" style="width: 250px" placeholder="Buscar.." [(ngModel)]="filterSerie"
+          <input type="text" class="form-control" maxlength="13" style="width: 200px" placeholder="Buscar.." [(ngModel)]="filterSerie"
             name="filterpost" />
         </div>
 
@@ -52,7 +35,7 @@
         </div>
         <div class="col-1">
           <label for="">&nbsp;&nbsp;&nbsp;</label><br>
-          <button class="btn btn-success" (click)="exportToExcel()">Exportar <i class="fa fa-file-excel"></i></button>
+          <button class="btn btn-success" (click)="exportToExcel()">Excel <i class="fa fa-file-excel"></i></button>
         </div>
         <div class="col-1">
           <div>
@@ -95,9 +78,10 @@
               <td>{{item.descripcionMotivoTraslado}}</td>
               <td>{{item.pesoBrutoTotalBienes}}</td>
               <td>
-                <span class="badge text-bg-primary" *ngIf="item.bl_estadoProceso=='SIGNED/AC_03'">ACEPTADO</span>
-                <span class="badge text-bg-warning" *ngIf="item.bl_estadoProceso=='SIGNED/PE_02'">EN PROCESO</span>
+                <span class="badge text-bg-primary" *ngIf="item.bl_estadoProceso=='SIGNED/AC_03'" >ACEPTADO</span>
+                <span class="badge text-bg-warning" *ngIf="item.bl_estadoProceso=='SIGNED/PE_02'" >EN PROCESO</span>
                 <span class="badge text-bg-warning" *ngIf="item.bl_estadoProceso=='SIGNED/PE_09'">EN PROCESO</span>
+                <span class="badge text-bg-warning" *ngIf="item.bl_estadoProceso=='SIGNED/ED_06'">EN PROCESO</span>
                 <span class="badge text-bg-danger" *ngIf="item.bl_estadoProceso=='SIGNED'">PENDIENTE</span>
                 <span class="badge text-bg-danger" *ngIf="item.bl_estadoProceso=='SIGNED/AN_04'">ANULADO</span>
                 <span class="badge text-bg-danger" *ngIf="item.bl_estadoProceso=='SIGNED/RC_05'">RECHAZADO</span>
