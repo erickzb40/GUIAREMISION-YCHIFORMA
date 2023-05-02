@@ -34,7 +34,7 @@ item: any;
   filterEmpaque='';
   //---------------------
   pais = 'PE';
-  tipodocEmp = '6';
+  tipodocEmp = '09';
   ubigeoDestinoUpdate = '';
   codigoPtollegadaUpdate='';
   direccionDestinoUpdate = '';
@@ -692,7 +692,6 @@ item: any;
         })
       }
     })
-
   }
   borrarEmpresa(ndoc) {
     Swal.showLoading();
@@ -883,10 +882,9 @@ item: any;
     if (this.listadoProductoDetalles.some(detalle => detalle.cliente !== cliente)) {
       throw 'No se puede asignar empaques de distintos clientes';
     }
+    this.listadoProductoDetalles=[];
       this.empaquesSeleccionadosTabla.forEach(element => {
-        if (!this.listadoProductoDetalles.some(detalle => detalle.codigo === element.codigo )) {
-          this.listadoProductoDetalles.push(element);
-        }
+        this.listadoProductoDetalles.push(element);
       });
   }
   editarUbigeo() {

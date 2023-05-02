@@ -16,25 +16,33 @@ export class ListaFacturacionElectronicaService {
 
   constructor(public http:HttpClient) { }
 
-  // url='https://localhost:7224/api/';
-  listas: string  = environment.API_URL+'Listas/';
-  api: string  = environment.API_URL+'api/';
+   url='http://192.168.1.6:92/api/';
+   //url='https://localhost:7224/api/';
+   //url='https://jk-smart.com:201/api/';;
 
   httpOptions = {
     headers: new HttpHeaders({
-      // 'token': localStorage.getItem('token'),
+      'token': localStorage.getItem('token'),
       'Content-Type': 'application/json'
     })
   };
 
-  listarAllListas(): Observable<AllListasInterface>{
-    return this.http.get<AllListasInterface>(this.listas+'allListas',this.httpOptions);
+  public getInfo(){
+    return this.http.get(this.url+'Facturacion',this.httpOptions);
   }
-  listarDocumentoPreview(fecha: string): Observable<DocumentosPreview[]>{
-    let parametro = new HttpParams().set('fecha',fecha)
-    return this.http.get<DocumentosPreview[]>(this.api+'ImportarDatos/ImportarByFecha',{headers: this.httpOptions.headers,params:parametro});
+  public getSerie(){
+    return this.http.get(this.url+'Facturacion/serie',this.httpOptions);
   }
-  listarDocumentoCompleto(invoiceNumber: number): Observable<DocumentoCompletoInterface>{
-    return this.http.get<DocumentoCompletoInterface>(this.api+'ImportarDatos/obtenerInvoice/'+invoiceNumber,{headers: this.httpOptions.headers});
+  public importarDatos(ndoc,desde,hasta){
+    return this.http.get(this.url+'Facturacion/importarDatos'+'?ndoc='+ndoc+'&desde='+desde+'&hasta='+hasta,this.httpOptions);
+  }
+  public getClientes(){
+    return this.http.get(this.url+'Facturacion/clientes',this.httpOptions);
+  }
+  public declararFactura(factura){
+    return this.http.post(this.url+'Facturacion/declararFactura',factura,this.httpOptions);
+  }
+  public getSerieTipoDoc(tipodoc){
+    return this.http.get(this.url+'Facturacion/getSerieTipoDoc?tipodoc='+tipodoc,this.httpOptions);
   }
 }

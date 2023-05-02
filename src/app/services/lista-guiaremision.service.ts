@@ -7,8 +7,8 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 export class ListaGuiaremisionService {
 
   constructor(public http:HttpClient) { }
-   //url='http://192.168.1.6:92/api/';
-   url='https://localhost:7224/api/';
+   url='http://192.168.1.6:92/api/';
+   //url='https://localhost:7224/api/';
    //url='https://jk-smart.com:201/api/';
   httpOptions = {
     headers: new HttpHeaders({
